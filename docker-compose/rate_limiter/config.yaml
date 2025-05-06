@@ -1,0 +1,10 @@
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: ""
+
+rate_limiter:
+  window_size: 1       # 秒
+  max_requests: 400     # 窗口内最大请求数
+  key_prefix: "rate_limit:"

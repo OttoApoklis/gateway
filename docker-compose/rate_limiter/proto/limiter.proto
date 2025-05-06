@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./proto;proto";
+
+service RateLimiter {
+  rpc Check(CheckRequest) returns (CheckResponse);
+}
+
+message CheckRequest {
+  string api = 1;      // 接口名
+  string location = 2; // 调用位置
+}
+
+message CheckResponse {
+  bool allowed = 1;     // 是否允许
+  string message = 2;   // 响应信息
+}

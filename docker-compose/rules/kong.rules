@@ -1,0 +1,11 @@
+groups:
+  - name: kong_rules
+    rules:
+      - alert: InterfaceAlert
+        expr: rate(kong_nginx_requests_total[1s]) > 100
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "This is an alert for interface frequency"
+

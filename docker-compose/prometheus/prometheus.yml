@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 1s  # 每1s抓取一次
+
+scrape_configs:
+  - job_name: 'kong-node1'  # 管理端口（8001）暴露的内存、缓存等状态指标
+    static_configs:
+      - targets: ['121.4.109.6:8001']
+    metrics_path: /metrics
+
+  - job_name: 'kong-node2'  # 代理端口（8000）暴露的 HTTP 请求状态指标（如 kong_http_status）
+    static_configs:
+      - targets: ['121.4.109.6:8011']
+    metrics_path: /metrics
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']  # 如果有 Alertmanager 服务，保留此配置；否则可删除
+
+rule_files:
+  - './rules/*.rules'  # 假设规则文件存放在 rules 目录下，文件后缀为 .rules
+
