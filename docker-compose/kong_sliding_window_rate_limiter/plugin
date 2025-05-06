@@ -1,0 +1,50 @@
+
+-- plugin.lua (Kong plugin)
+local redis = require "resty.redis"
+local cjson = require "cjson"
+
+local _M = {}
+
+function _M.access(self)
+    local red = redis:new()
+    red:set_timeout(1000)  -- 1 second
+
+    -- Connect to Redis server
+    local ok, err = red:connect("127.0.0.1", 6379)
+    if not ok then
+        return kong.response.error(500, "Failed to connect to Redis: " .. err)
+    end
+
+    -- Fetch parameters
+    local key = kong.service.request.get_path()  -- Using request path as key
+    local windowSize = kong.configuration.window_size or 1000
+    local maxRequests = kong.configuration.max_requests or 100
+    local now = ngx.time()
+    local windowStart = now - (windowSize / 1000)
+    local expireTime = windowSize / 1000 + 1
+    local member = kong.client.get_client_ip()
+
+    -- Lua script to check and update sliding window
+    local script = [[
+        redis.call('ZREMRANGEBYSCORE', KEYS[1], 0, ARGV[1])
+        local count = redis.call('ZCARD', KEYS[1])
+        redis.call('ZADD', KEYS[1], ARGV[2], ARGV[3])
+        redis.call('EXPIRE', KEYS[1], tonumber(ARGV[4]))
+        return count
+    ]]
+
+    -- Run Lua script
+    local res, err = red:eval(script, 1, key, windowStart, now, member, expireTime)
+    if err then
+        return kong.response.error(500, "Redis Lua script error: " .. err)
+    end
+
+    -- Check if the request count exceeds maxRequests
+    if res >= maxRequests then
+        return kong.response.error(429, "Rate limit exceeded")
+    end
+
+    return kong.response.exit(200)
+end
+
+return _M

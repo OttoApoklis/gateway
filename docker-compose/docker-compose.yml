@@ -50,6 +50,7 @@ services:
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       KONG_STATUS_LISTEN: 0.0.0.0:8100
       KONG_PROMETHEUS_ENABLED: "on"
+      KONG_PLUGINS: bundled,kong_sliding_window_rate_limiter  # 启用插件
     restart: always
 
   kong-node2:
@@ -73,6 +74,7 @@ services:
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       KONG_STATUS_LISTEN: 0.0.0.0:8110
       KONG_PROMETHEUS_ENABLED: "on"
+      KONG_PLUGINS: bundled,kong_sliding_window_rate_limiter  # 启用插件
     restart: always
 
   kong-init:
