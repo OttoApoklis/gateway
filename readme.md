@@ -15,7 +15,7 @@ kong+ratelimit插件
 可以看到部分请求被限流
 ![alt text](image-5.png)
 ### 普罗米修斯监控
-![alt text](image-2.png)
+![alt text](image.png)
 由于监控精度在2s区间范围因此通过请求的数量在50范围内波动
 ### 优化方向
 自定义插件实现滑动窗口算法
